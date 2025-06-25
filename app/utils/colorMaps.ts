@@ -1,4 +1,3 @@
-import { Priority, Status, CategoryType, Importance } from '@/app/generated/prisma/client';
 
 export const colorMaps = {
     priority: {
