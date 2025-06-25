@@ -16,8 +16,8 @@ import {createTaskSchema} from '@/app/validationSchemas';
 import {z} from 'zod';
 import {useEffect, useState} from 'react';
 import {Status, CategoryType, Priority, Importance} from '@/app/generated/prisma/client';
-import ErrorMessage from '@/app/Components/ErrorMessage';
-import Spinner from '@/app/Components/Spinner';
+import ErrorMessage from '@/app/components/ErrorMessage';
+import Spinner from '@/app/components/Spinner';
 
 
 export type TaskFormData = z.infer<typeof createTaskSchema>;
