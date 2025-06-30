@@ -1,15 +1,26 @@
-@import "tailwindcss";
+/* globals.css */
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-geist-sans); /* Use Geist font for sans */
+  --font-mono: var(--font-geist-mono); /* Use Mono font for monospace */
+}
+
+@layer utilities {
+  /* You can now safely use the font variables */
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family:
+      var(--font-geist-sans), Arial, Helvetica, sans-serif; /* Use custom font */
+  }
+
+  :root {
+    --background: #ffffff; /* Default background color */
+    --foreground: #333333; /* Default text color */
+  }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -17,10 +28,4 @@
     --background: #0a0a0a;
     --foreground: #ededed;
   }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
 }
