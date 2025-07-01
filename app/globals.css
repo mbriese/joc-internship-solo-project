@@ -1,4 +1,6 @@
 /* globals.css */
+/* app/globals.css */
+@import "tailwindcss";
 
 
 @theme inline {
