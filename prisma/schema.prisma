@@ -1,0 +1,72 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model task {
+  taskId      Int          @id @unique @default(autoincrement())
+  title       String       @db.VarChar(255)
+  description String       @db.Text
+  status      Status       @default(OPEN)
+  category    CategoryType @default(OTHER)
+  priority    Priority     @default(MEDIUM)
+  importance  Importance   @default(MEDIUM)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  dueDate     DateTime     @default(now())
+  userId      Int
+  user        user         @relation(fields: [userId], references: [userId])
+}
+
+enum Status {
+  OPEN
+  IN_PROGRESS
+  INCOMPLETE
+  COMPLETED
+  CLOSED
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum Importance {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum CategoryType {
+  WORK
+  PERSONAL
+  ERRANDS
+  HEALTH
+  FINANCE
+  LEARNING
+  OTHER
+}
+
+model user {
+  userId      Int      @id @unique @default(autoincrement())
+  fname       String   @db.VarChar(255)
+  lname       String   @db.VarChar(255)
+  email       String   @unique
+  description String   @db.VarChar(255)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  tasks       task[]
+}
