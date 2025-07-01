@@ -3,12 +3,8 @@
 import { Pencil, Trash2, CheckCircle } from 'lucide-react';
 import { motion } from "framer-motion";
 import Link from 'next/link';
-import {
-    Priority,
-    CategoryType,
-    Status,
-    Importance,
-} from '@/app/generated/prisma/client';
+import { colorMaps } from "@/app/utils/colorMaps"; // Import the color maps
+import { Priority, CategoryType, Status, Importance } from '@/app/generated/prisma/client';
 
 type TaskPropsModel = {
     taskId: number;
@@ -27,42 +23,11 @@ type TaskPropsModel = {
 type TaskCardProps = {
     task: TaskPropsModel;
     onDelete: (id: number) => void;
-    onComplete: (id: number) => void;
+    onComplete: (id: number) => void; // Pass onComplete handler here
 };
 
 const TaskCard = ({ task, onDelete, onComplete }: TaskCardProps) => {
     const formattedDueDate = new Date(task.dueDate).toLocaleDateString();
-
-    const priorityColorMap: Record<Priority, string> = {
-        URGENT: 'bg-red-100 text-black-700',
-        HIGH: 'bg-orange-100 text-orange-700',
-        MEDIUM: 'bg-yellow-100 text-yellow-800',
-        LOW: 'bg-green-100 text-green-700',
-    };
-
-    const importanceColorMap: Record<Importance, string> = {
-        HIGH: 'bg-orange-100 text-orange-900',
-        MEDIUM: 'bg-yellow-100 text-yellow-800',
-        LOW: 'bg-green-100 text-green-700',
-    };
-
-    const categoryColorMap: Record<CategoryType, string> = {
-        WORK: 'bg-blue-100 text-blue-700',
-        PERSONAL: 'bg-purple-100 text-purple-700',
-        ERRANDS: 'bg-green-100 text-green-700',
-        HEALTH: 'bg-pink-100 text-pink-700',
-        FINANCE: 'bg-yellow-100 text-yellow-700',
-        LEARNING: 'bg-indigo-100 text-indigo-700',
-        OTHER: 'bg-gray-200 text-gray-800',
-    };
-
-    const statusColorMap: Record<Status, string> = {
-        OPEN: 'bg-gray-100 text-gray-700',
-        IN_PROGRESS: 'bg-yellow-100 text-yellow-800',
-        COMPLETED: 'bg-green-100 text-green-700',
-        INCOMPLETE: 'bg-green-100 text-green-700',
-        CLOSED: 'bg-green-100 text-green-800',
-    };
 
     return (
         <motion.div
@@ -74,9 +39,7 @@ const TaskCard = ({ task, onDelete, onComplete }: TaskCardProps) => {
 
             <div>
                 <h3
-                    className={`text-lg font-semibold ${
-                        task.status ? 'text-gray-400' : ''
-                    }`}
+                    className={`text-lg font-semibold ${task.status ? 'text-gray-400' : ''}`}
                 >
                     {task.title}
                 </h3>
@@ -85,27 +48,27 @@ const TaskCard = ({ task, onDelete, onComplete }: TaskCardProps) => {
                 <div className="text-sm text-gray-500 space-y-1">
                     <div>
                         <strong>Category:</strong>{' '}
-                        <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${categoryColorMap[task.category]}`}>
-              {task.category}
-            </span>
+                        <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${colorMaps.category[task.category]}`}>
+                            {task.category}
+                        </span>
                     </div>
                     <div>
                         <strong>Status:</strong>{' '}
-                        <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${statusColorMap[task.status]}`}>
-              {task.status}
-            </span>
+                        <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${colorMaps.status[task.status]}`}>
+                            {task.status}
+                        </span>
                     </div>
                     <div>
                         <strong>Priority:</strong>{' '}
-                        <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${priorityColorMap[task.priority]}`}>
-              {task.priority}
-            </span>
+                        <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${colorMaps.priority[task.priority]}`}>
+                            {task.priority}
+                        </span>
                     </div>
                     <div>
                         <strong>Importance:</strong>{' '}
-                        <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${importanceColorMap[task.importance]}`}>
-              {task.importance}
-            </span>
+                        <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${colorMaps.importance[task.importance]}`}>
+                            {task.importance}
+                        </span>
                     </div>
                     <div>
                         <strong>Due:</strong> {formattedDueDate}
@@ -122,8 +85,9 @@ const TaskCard = ({ task, onDelete, onComplete }: TaskCardProps) => {
                     <Pencil size={18} />
                 </Link>
 
+                {/* Mark as Complete Button */}
                 <button
-                    onClick={() => onComplete(task.taskId)}
+                    onClick={() => onComplete(task.taskId)} // Calls onComplete handler
                     className="text-green-600 hover:text-green-800"
                     title="Mark as complete"
                 >

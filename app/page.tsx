@@ -1,4 +1,5 @@
 import Dashboard from "./components/Dashboard";
+
 export const metadata = {
   title: 'Personal Task Manager',
 };
