@@ -18,11 +18,13 @@ const TasksPage = () => {
     const [tasks, setTasks] = useState<task[]>([]);
     const [visibleTasks, setVisibleTasks] = useState<Record<number, boolean>>({});
     const [loading, setLoading] = useState<boolean>(false);
+    const [sortBy, setSortBy] = useState<'dueDate' | 'priority'>('dueDate');
+    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
     useEffect(() => {
         fetch('/api/users')
             .then((res) => res.json())
-            .then((data) => setUsers(data))
+            .then(setUsers)
             .catch((err) => console.error('Failed to load users:', err));
     }, []);
 
@@ -33,40 +35,67 @@ const TasksPage = () => {
         }
 
         setLoading(true);
-        const url =
-            selectedUserId === -1
-                ? '/api/tasks'
-                : `/api/tasks?userId=${selectedUserId}`;
+        const url = new URL('/api/tasks', window.location.origin);
+        if (selectedUserId !== -1) {
+            url.searchParams.set('userId', selectedUserId.toString());
+        }
+        url.searchParams.set('sortBy', sortBy);
+        url.searchParams.set('sortOrder', sortOrder);
 
-        fetch(url)
+        fetch(url.toString())
             .then((res) => res.json())
             .then((data) => {
                 setTasks(data.tasks);
-                const visibilityMap: Record<number, boolean> = {};
-                data.tasks.forEach((task: task) => {
-                    visibilityMap[task.taskId] = true;
-                });
-                setVisibleTasks(visibilityMap);
+                const visibility: Record<number, boolean> = {};
+                data.tasks.forEach((t: task) => (visibility[t.taskId] = true));
+                setVisibleTasks(visibility);
             })
-            .catch((err) => console.error('Failed to fetch tasks:', err))
+            .catch((err) => console.error('Fetch tasks error:', err))
             .finally(() => setLoading(false));
-    }, [selectedUserId]);
+    }, [selectedUserId, sortBy, sortOrder]);
 
-    const handleDelete = async (taskId: number) => {
+    const handleDelete = (taskId: number) => {
         console.log(`Deleting task ${taskId}`);
     };
 
-    const handleComplete = async (taskId: number) => {
+    const handleComplete = (taskId: number) => {
         console.log(`Completing task ${taskId}`);
     };
 
     return (
-        <div className="p-6 space-y-6">
+        <div className="p-6 space-y-4">
             <UserSelect
                 users={users}
                 selectedUserId={selectedUserId}
                 onChange={setSelectedUserId}
             />
+
+            {selectedUserId !== null && (
+                <div className="flex space-x-4 items-center">
+                    <label>Sort by:</label>
+                    <select
+                        value={sortBy}
+                        onChange={(e) => setSortBy(e.target.value as 'dueDate' | 'priority')}
+                        className="p-2 border rounded"
+                    >
+                        <option value="dueDate">Due Date</option>
+                        <option value="priority">Priority</option>
+                    </select>
+
+                    <select
+                        value={sortOrder}
+                        onChange={(e) => setSortOrder(e.target.value as 'asc' | 'desc')}
+                        className="p-2 border rounded"
+                    >
+                        <option value="asc">
+                            {sortBy === 'priority' ? 'Low → High' : 'Oldest → Newest'}
+                        </option>
+                        <option value="desc">
+                            {sortBy === 'priority' ? 'High → Low' : 'Newest → Oldest'}
+                        </option>
+                    </select>
+                </div>
+            )}
 
             <TaskList
                 tasks={tasks}
