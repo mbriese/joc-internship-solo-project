@@ -21,6 +21,7 @@ const SimpleMDE = dynamic(() => import('react-simplemde-editor'), {
 
 export type TaskFormData = z.infer<typeof createTaskSchema>;
 
+
 type TaskFormProps = {
     initialValues?: Partial<TaskFormData>;
     onSubmit: (data: TaskFormData) => void;
@@ -34,8 +35,10 @@ const TaskForm = ({
                       isSubmitting = false,
                       error,
                   }: TaskFormProps) => {
-    const [isClient, setIsClient] = useState<boolean>(false)
-    const [isSuccess, setSuccess] = useState(false)
+    const isEditing = Object.keys(initialValues).length > 0;
+
+    const [isClient, setIsClient] = useState(false);
+    const [isSuccess, setSuccess] = useState(false);
     type UserOption = { userId: number; fname: string; lname: string };
     const [users, setUsers] = useState<UserOption[]>([]);
 
@@ -98,7 +101,9 @@ const TaskForm = ({
         <div className="max-w-xl mx-auto py-8 space-y-6">
             {/* Header */}
             <div className="flex items-center justify-between">
-                <h1 className="text-3xl font-extrabold">Create New Task</h1>
+                <h1 className="text-3xl font-extrabold">
+                    {isEditing ? 'Edit Task' : 'Create New Task'}
+                </h1>
                 <Link href="/tasks">
                     <Button variant="outline" color="gray" className="px-4 py-2">
                         ← Back to Tasks

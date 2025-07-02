@@ -44,16 +44,25 @@ const Dashboard = () => {
     };
 
     const handleComplete = async (id: number) => {
-        const res = await fetch(`/api/tasks/${id}/complete`, { method: 'PATCH' });
-        if (res.ok) {
-            const updated = await res.json();
-            setTopTasks(prev =>
-                prev.map(t => (t.taskId === id ? updated : t)).filter(t => t.status !== 'COMPLETED')
-            );
-            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-        } else {
-            console.error('❌ Failed to complete task');
+        const res = await fetch(`/api/tasks/${id}`,
+            { method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ complete: true }),  // mark task completed
+            });
+        if (!res.ok) {
+            console.error('❌ Failed to complete task', await res.text());
+            return;
         }
+
+        const updated = await res.json();
+        setTopTasks(prev =>
+            prev
+                .map(t => (t.taskId === id ? updated : t))
+                .filter(t => t.status !== 'COMPLETED')
+        );
+        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
     };
 
     return (
