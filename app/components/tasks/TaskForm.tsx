@@ -195,26 +195,33 @@ const TaskForm = ({
                 </div>
                 <ErrorMessage>{errors.userId?.message}</ErrorMessage>
 
-                <div className="flex justify-end items-center space-x-4 pt-4">
-                    {/* ✅ Correct: This ensures the form is actually submitted */}
-                    <Button type="submit"
-                            disabled={isSubmitting}
-                            className="rounded-lg px-4 py-2"
-                            onClick={() => console.log('🖱️ clicked submit')}>
-                        Submit Task {isSubmitting && <Spinner/>}
-                    </Button>
+                <div className="flex items-center pt-4">
                     <Button
                         type="button"
                         variant="outline"
                         color="gray"
                         radius="large"
+                        className="mr-auto px-10 py-2"
                         onClick={() => {
-                            reset(initialValues);         // ✅ resets initial values
-                            setSuccess(false); // ✅ clears success state too, if needed
+                            reset(initialValues);
+                            setSuccess(false);
                         }}
-                    > Cancel
+                    >
+                        Cancel
+                    </Button>
+
+                    <Button
+                        type="submit"
+                        color="green"
+                        radius="large"
+                        disabled={isSubmitting}
+                        className="ml-auto px-10 py-2"
+                        onClick={() => console.log('🖱️ clicked submit')}
+                    >
+                        Submit Task {isSubmitting && <Spinner />}
                     </Button>
                 </div>
+
             </form>
         </div>
     );

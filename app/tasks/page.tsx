@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import UserSelect from '@/app/components/users/UserSelect';
 import TaskList from '@/app/components/tasks/TaskList';
 import { task } from '@/app/generated/prisma/client';
-import Link from "next/link";
 
 interface User {
     userId: number;
@@ -70,18 +69,6 @@ const TasksPage = () => {
                 selectedUserId={selectedUserId}
                 onChange={setSelectedUserId}
             />
-
-            {/* + New Task button (TailwindCSS styled) */}
-            <div className="mb-4">
-                <Link href="/tasks/new">
-                    <button
-                        type="button"
-                        className="inline-flex items-center bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow transition"
-                    >
-                        + New Task
-                    </button>
-                </Link>
-            </div>
 
             {selectedUserId !== null && (
                 <div className="flex space-x-4 items-center">
