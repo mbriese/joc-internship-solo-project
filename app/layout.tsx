@@ -1,6 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-
+import { Theme } from "@radix-ui/themes";
 import LayoutWrapper from './components/LayoutWrapper';
 import React from "react";
 import {Metadata} from "next";
@@ -25,7 +25,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     return (
         <html lang="en">
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <Theme>
         <LayoutWrapper>{children}</LayoutWrapper>
+        </Theme>
         </body>
         </html>
     );

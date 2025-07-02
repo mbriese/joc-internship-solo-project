@@ -3,9 +3,16 @@ import { prisma } from '@/app/lib/prisma';
 import { CategoryType, Status, Priority, Importance } from '@/app/generated/prisma/client';
 import { createTaskSchema } from '@/app/validationSchemas';
 
+type Params = { id: string };
+
 // ✅ GET /api/tasks/[id]
-export async function GET(request: NextRequest, context: { params: { id: string } }) {
-    const { id } = context.params;
+export async function GET(
+    request: NextRequest,
+    { params }: { params: Promise<Params> }
+    ){
+    console.log('in GET ', request.url);
+    console.log('in POST ', id)
+    const { id } = await params;
     const taskId = parseInt(id, 10);
     if (isNaN(taskId)) {
         return NextResponse.json({ error: 'Invalid ID' }, { status: 400 });
@@ -19,14 +26,12 @@ export async function GET(request: NextRequest, context: { params: { id: string 
     return NextResponse.json(task);
 }
 
+// ✅ DELETE /api/tasks/[id]
 export async function DELETE(
-    _request: NextRequest,
-
-    { params }: { params: { id: string } }
-) {
-    const localparams = await params
-    const taskId = parseInt(localparams.id, 10);
-
+    request: NextRequest,
+    {params}: { params: { id: string } }) {
+    const { id } = await params;
+    const taskId = parseInt(id, 10);
     if (isNaN(taskId)) {
         return NextResponse.json({ error: 'Invalid task ID' }, { status: 400 });
     }
@@ -35,11 +40,11 @@ export async function DELETE(
     return NextResponse.json({ success: true });
 }
 
-
-
 // ✅ PATCH /api/tasks/[id]
-export async function PATCH(request: NextRequest, context: { params: { id: string } }) {
-    const { id } = context.params;
+export async function PATCH(
+    request: NextRequest,
+    { params }: { params: Promise<Params> }) {
+    const { id } = await params;
     const taskId = parseInt(id, 10);
     if (isNaN(taskId)) {
         return NextResponse.json({ error: 'Invalid task ID' }, { status: 400 });
@@ -48,9 +53,22 @@ export async function PATCH(request: NextRequest, context: { params: { id: strin
     const body = await request.json();
     console.log('🎯 PATCH body:', body);
 
+    // Check if the request is for marking the task as completed
+    if (body.complete) {
+        const updated = await prisma.task.update({
+            where: { taskId },
+            data: { status: Status.COMPLETED },
+        });
+        return NextResponse.json(updated);
+    }
+
+    // Otherwise, handle regular task updates
     const parsed = createTaskSchema.safeParse(body);
     if (!parsed.success) {
-        return NextResponse.json({ error: parsed.error.format() }, { status: 400 });
+        return NextResponse.json(
+            { error: parsed.error.format() },
+            { status: 400 }
+        );
     }
 
     const data = parsed.data;

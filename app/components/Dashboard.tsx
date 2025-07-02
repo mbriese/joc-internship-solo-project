@@ -4,22 +4,21 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 
 import classnames from "classnames";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import {useRouter, usePathname } from "next/navigation";
-//import type { task as PrismaTask } from "@/app/generated/prisma/client";
+import type { task as PrismaTask } from "@/app/generated/prisma/client";
 import { CheckCircle, Pencil, Trash2 } from "lucide-react";
 import confetti from "canvas-confetti";
 
 const Dashboard = () => {
     const currentPath = usePathname();
-    //const router = useRouter();
-    // @ts-expect-error
+    const router = useRouter();
     const [topTasks, setTopTasks] = useState<PrismaTask[]>([]);
 
     const links = [
         { label: "Add Task", href: "/tasks/new" },
         { label: "Add User", href: "/users/new" },
         { label: "All Tasks", href: "/tasks" },
+        { label: "All Users", href: "/users" },
     ];
 
     useEffect(() => {

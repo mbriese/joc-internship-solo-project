@@ -2,12 +2,8 @@
 
 
 import {Button, Callout, TextField} from '@radix-ui/themes';
-
 import dynamic from 'next/dynamic';
-const SimpleMDE = dynamic(() => import('react-simplemde-editor'), {
-    ssr: false,
-});
-
+import Link from 'next/link';
 import "easymde/dist/easymde.min.css";
 import {useRouter} from "next/navigation";
 import {Controller, useForm} from 'react-hook-form';
@@ -19,7 +15,9 @@ import {Status, CategoryType, Priority, Importance} from '@/app/generated/prisma
 import ErrorMessage from '@/app/components/ErrorMessage';
 import Spinner from '@/app/components/Spinner';
 
-
+const SimpleMDE = dynamic(() => import('react-simplemde-editor'), {
+    ssr: false,
+});
 
 export type TaskFormData = z.infer<typeof createTaskSchema>;
 
@@ -96,12 +94,18 @@ const TaskForm = ({
         }
     );
 
-
-
-
-
     return (
-        <div className="max-w-xl space-y-5">
+        <div className="max-w-xl mx-auto py-8 space-y-6">
+            {/* Header */}
+            <div className="flex items-center justify-between">
+                <h1 className="text-3xl font-extrabold">Create New Task</h1>
+                <Link href="/tasks">
+                    <Button variant="outline" color="gray" className="px-4 py-2">
+                        ← Back to Tasks
+                    </Button>
+                </Link>
+            </div>
+            {/* Callouts */}
             {error && (
                 <Callout.Root color="red">
                     <Callout.Text>{error}</Callout.Text>
@@ -191,24 +195,33 @@ const TaskForm = ({
                 </div>
                 <ErrorMessage>{errors.userId?.message}</ErrorMessage>
 
-
-                <div className="space-y-2">
-                    {/* ✅ Correct: This ensures the form is actually submitted */}
-                    <Button type="submit"  disabled={isSubmitting} onClick={() => console.log('🖱️ clicked submit')}>
-                        Submit Task {isSubmitting && <Spinner/>}
-                    </Button>
+                <div className="flex items-center pt-4">
                     <Button
                         type="button"
                         variant="outline"
                         color="gray"
+                        radius="large"
+                        className="mr-auto px-10 py-2"
                         onClick={() => {
-                            reset(initialValues);         // ✅ resets initial values
-                            setSuccess(false); // ✅ clears success state too, if needed
+                            reset(initialValues);
+                            setSuccess(false);
                         }}
                     >
                         Cancel
                     </Button>
+
+                    <Button
+                        type="submit"
+                        color="green"
+                        radius="large"
+                        disabled={isSubmitting}
+                        className="ml-auto px-10 py-2"
+                        onClick={() => console.log('🖱️ clicked submit')}
+                    >
+                        Submit Task {isSubmitting && <Spinner />}
+                    </Button>
                 </div>
+
             </form>
         </div>
     );

@@ -28,12 +28,14 @@ const UsersPage = () => {
 
     return (
         <div className="max-w-3xl mx-auto py-8 space-y-6">
-            <div className="flex justify-between items-center">
-                <h1 className="text-2xl font-bold">Users</h1>
-                <Button asChild>
-                    <Link href="/users/new">New User</Link>
-                </Button>
-            </div>
+            <Link href="/users/new">
+                <button
+                    type="button"
+                    className="inline-flex items-center bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow transition"
+                >
+                    + New User
+                </button>
+            </Link>
 
             {loading && <p>Loading users...</p>}
 

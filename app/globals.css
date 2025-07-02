@@ -1,4 +1,7 @@
 /* globals.css */
+/* app/globals.css */
+@import "tailwindcss";
+@import "@radix-ui/themes/styles.css";
 
 
 @theme inline {
