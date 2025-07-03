@@ -11,8 +11,9 @@ export async function GET(
     { params }: { params: Promise<Params> }
     ){
     console.log('in GET ', request.url);
-    console.log('in POST ', id)
+
     const { id } = await params;
+    console.log('got id: ', id);
     const taskId = parseInt(id, 10);
     if (isNaN(taskId)) {
         return NextResponse.json({ error: 'Invalid ID' }, { status: 400 });
