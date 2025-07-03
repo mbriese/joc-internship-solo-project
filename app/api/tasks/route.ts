@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@/app/generated/prisma/index";
+import { NextRequest, NextResponse } from 'next/server';
+import { PrismaClient, Prisma } from '@prisma/client';
+
 import { Status, CategoryType } from "@/app/generated/prisma/client";
 import { createTaskSchema } from "@/app/validationSchemas";
 
@@ -7,36 +8,48 @@ const prisma = new PrismaClient();
 
 export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
-    // Fetch the userId from query params, default to undefined if not provided
-    const userId = searchParams.get("userId") || undefined;
-    const status = searchParams.get("status") || undefined;
-    const category = searchParams.get("category") || undefined;
 
-    const validSortBy = ["dueDate", "createdAt", "priority"] as const;
-    const sortByParam = searchParams.get("sortBy");
-    const sortBy = validSortBy.includes(sortByParam as never) ? sortByParam! : "dueDate";
-    const sortOrder = searchParams.get("sortOrder") === "desc" ? "desc" : "asc";
+    // 1) Parse filters
+    const userIdParam = searchParams.get('userId');
+    const statusParam = searchParams.get('status');
+    const categoryParam = searchParams.get('category');
+    const where: Prisma.TaskWhereInput = {}
+    if (userIdParam) where.userId = Number(userIdParam);
+    if (statusParam) where.status = statusParam as Status;
+    if (categoryParam) where.category = categoryParam as CategoryType;
 
-    const page = Math.max(parseInt(searchParams.get("page") || "1", 10), 1);
-    const pageSize = Math.min(Math.max(parseInt(searchParams.get("pageSize") || "10", 10), 1), 50);
-    const skip = (page - 1) * pageSize;
+    // 2) Parse sorting
+    const validSortBy = ['dueDate', 'createdAt', 'priority'] as const;
+    const sortByParam = searchParams.get('sortBy') as string;
+    const sortBy = validSortBy.includes(sortByParam as any)
+        ? sortByParam
+        : 'dueDate';
+    const sortOrder = searchParams.get('sortOrder') === 'desc' ? 'desc' : 'asc';
 
-    const where = {
-        ...(userId && { userId: Number(userId) }),
-        ...(status && { status: status as Status }),
-        ...(category && { category: category as CategoryType }),
+    // 3) Build the base prisma options
+    const findOptions: any = {
+        where,
+        orderBy: { [sortBy]: sortOrder },
     };
 
+    // 4) Conditionally apply pagination only if both params are present
+    if (searchParams.has('page') && searchParams.has('pageSize')) {
+        const page = Math.max(parseInt(searchParams.get('page')!, 10), 1);
+        const pageSize = Math.min(
+            Math.max(parseInt(searchParams.get('pageSize')!, 10), 1),
+            50
+        );
+        findOptions.skip = (page - 1) * pageSize;
+        findOptions.take = pageSize;
+    }
+
+    // 5) Run the count + findMany in a transaction
     const [total, tasks] = await prisma.$transaction([
         prisma.task.count({ where }),
-        prisma.task.findMany({
-            where,
-            skip,
-            take: pageSize,
-            orderBy: { [sortBy]: sortOrder },
-        }),
+        prisma.task.findMany(findOptions),
     ]);
 
+    // 6) Return both total & tasks
     return NextResponse.json({ total, tasks });
 }
 
